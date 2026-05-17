@@ -1,0 +1,120 @@
+﻿@model IEnumerable<TMS_Project.Models.Tournee>
+@{
+    ViewData["Title"] = "Tournées";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">📅 Tournées</h3>
+
+    <p>
+        <a asp-controller="Tournee" asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-circle"></i> Créer une tournée
+        </a>
+    </p>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Date</th>
+                        <th>Transporteur</th>
+                        <th>Camion</th>
+                        <th>Chauffeur</th>
+                        <th>Cout total (MAD)</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-4">Aucune tournée trouvée.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var t in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">@t.TourneeId</td>
+                                <td>@t.DateTournee.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(t.Transporteur?.Nom ?? "N/A")</td>
+                                <td>@(t.Camion?.Immatriculation ?? "N/A")</td>
+                                <td>@(t.Chauffeur?.Nom ?? "N/A")</td>
+                                <td class="fw-bold text-primary">@t.CoutTotal.ToString("N2") MAD</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a asp-action="Details" asp-route-id="@t.TourneeId" class="btn btn-sm btn-info text-white rounded-pill px-3">Détails</a>
+                                        <a asp-action="Edit" asp-controller="Tournee" asp-route-id="@t.TourneeId" class="btn btn-sm btn-warning rounded-pill px-3">Modifier</a>
+                                        
+                                        <!-- Formulaire invisible pour le Delete -->
+                                        <form id="delete-form-@t.TourneeId" asp-action="Delete" asp-route-id="@t.TourneeId" method="post" style="display:none;">
+                                            @Html.AntiForgeryToken()
+                                        </form>
+
+                                        <!-- Bouton Supprimer m-fiksi -->
+                                        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3"
+                                                onclick="confirmDelete(@t.TourneeId, '@t.DateTournee.ToString("dd/MM/yyyy")')">
+                                            Supprimer
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id, date) {
+        Swal.fire({
+        title: 'Supprimer ?',
+        text: "Voulez-vous supprimer la tournée du " + date + " ?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler',
+        borderRadius: '15px'
+        }).then((result) => {
+        if (result.isConfirmed) {
+        document.getElementById('delete-form-' + id).submit();
+        }
+        })
+        }
+
+
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                Swal.fire({
+                icon: 'success',
+                title: 'Succès',
+                html: '@Html.Raw(TempData["Success"])',
+                timer: 3000,
+                showConfirmButton: false,
+                borderRadius: '15px'
+                });
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                html: '@Html.Raw(TempData["Error"])',
+                confirmButtonColor: '#dc3545',
+                borderRadius: '15px'
+                });
+            </text>
+        }
+    </script>
+}

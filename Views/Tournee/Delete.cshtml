@@ -1,0 +1,50 @@
+﻿@model TMS_Project.Models.Tournee
+@{
+    ViewData["Title"] = "Supprimer Tournée";
+}
+
+<div class="container py-4">
+    <h3 class="fw-bold text-danger">Supprimer la tournée #@Model.TourneeId</h3>
+
+    <div class="alert alert-warning border-0 shadow-sm rounded-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Voulez-vous vraiment supprimer cette tournée ?
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body">
+            <table class="table">
+                <tr><th class="border-0">ID</th><td class="border-0">@Model.TourneeId</td></tr>
+                <tr><th>Date</th><td>@Model.DateTournee.ToString("dd/MM/yyyy HH:mm")</td></tr>
+                <tr><th>Coût total</th><td>@Model.CoutTotal.ToString("N2") MAD</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="TourneeId" />
+        <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm">
+            <i class="bi bi-trash"></i> Confirmer la suppression
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm">
+            Annuler
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                Swal.fire({
+                icon: 'error',
+                title: 'Attention',
+                html: '@Html.Raw(TempData["Error"])', //  encoding
+                confirmButtonColor: '#dc3545'
+                });
+            </text>
+        }
+    </script>
+}

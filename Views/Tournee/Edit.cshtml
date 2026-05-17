@@ -1,0 +1,131 @@
+﻿@model TMS_Project.ViewModels.TourneeFormViewModel
+
+@{
+    ViewData["Title"] = "Modifier la tournée";
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-warning">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="mb-0">Modifier la tournée #@Model.Tournee.TourneeId</h3>
+        </div>
+        <div class="card-body">
+            @* Affichage des erreurs de validation *@
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+
+                @* Hidden input indispensable pour l'ID *@
+                <input type="hidden" asp-for="@Model.Tournee.TourneeId" />
+
+                <div class="row g-3">
+                    @* Date *@
+                    <div class="col-md-4">
+                        <label asp-for="@Model.Tournee.DateTournee" class="form-label">Date de la Tournée</label>
+                        <input asp-for="@Model.Tournee.DateTournee" class="form-control" type="datetime-local" />
+                    </div>
+
+                    @* Transporteur *@
+                    <div class="col-md-4">
+                        <label asp-for="@Model.Tournee.TransporteurId" class="form-label">Transporteur</label>
+                        <select asp-for="@Model.Tournee.TransporteurId" asp-items="@Model.Transporteurs" class="form-select">
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+
+                    @* Statut *@
+                    <div class="col-md-4">
+                        <label asp-for="@Model.Tournee.StatutTournee" class="form-label">Statut</label>
+                        <select asp-for="@Model.Tournee.StatutTournee" class="form-select">
+                            <option value="Planifiée">Planifiée</option>
+                            <option value="En cours">En cours</option>
+                            <option value="Terminée">Terminée</option>
+                        </select>
+                    </div>
+
+                    @* Camion *@
+                    <div class="col-md-6">
+                        <label asp-for="@Model.Tournee.CamionId" class="form-label">Camion</label>
+                        <select asp-for="@Model.Tournee.CamionId" asp-items="@Model.Camions" class="form-select">
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+
+                    @* Chauffeur *@
+                    <div class="col-md-6">
+                        <label asp-for="@Model.Tournee.ChauffeurId" class="form-label">Chauffeur</label>
+                        <select asp-for="@Model.Tournee.ChauffeurId" asp-items="@Model.Chauffeurs" class="form-select">
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+
+                    @* Livraisons (Multi-sélection) *@
+                    <div class="col-12">
+                        <label class="form-label fw-bold">📦 Gérer les livraisons affectées</label>
+                        <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                            @if (Model.LivraisonsDisponibles == null || !Model.LivraisonsDisponibles.Any())
+                            {
+                                <div class="text-muted italic">Aucune autre livraison disponible.</div>
+                            }
+                            else
+                            {
+                                foreach (var livraison in Model.LivraisonsDisponibles)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input chk-livraison"
+                                               type="checkbox"
+                                               name="SelectedLivraisonIds"
+                                               value="@livraison.LivraisonId"
+                                               id="liv-@livraison.LivraisonId"
+                                               data-prix="100" @* Hna t-qder t-zid l-prix réel dial l-colis *@
+                                        @(Model.SelectedLivraisonIds != null && Model.SelectedLivraisonIds.Contains(livraison.LivraisonId) ? "checked" : "") />
+                                        <label class="form-check-label" for="liv-@livraison.LivraisonId">
+                                            #@livraison.LivraisonId - @livraison.Adresse
+                                        </label>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h5 class="text-warning">Coût de la tournée</h5>
+
+                    <div class="col-md-6">
+                        <label asp-for="@Model.Tournee.CoutTotal" class="form-label">Coût Total (MAD)</label>
+                        @* Hiyedna 'readonly' o derna 'id' bach n-t-h-akk-mou fih b JavaScript *@
+                        <input asp-for="@Model.Tournee.CoutTotal" id="inputCoutTotal" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="@Model.Tournee.CoutTotal" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4 border-top pt-3">
+                    <button type="submit" class="btn btn-warning px-4 fw-bold">Mettre à jour</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.querySelectorAll('.chk-livraison').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                let total = 0;
+                document.querySelectorAll('.chk-livraison:checked').forEach(checkedBox => {
+
+                    total += parseFloat(checkedBox.getAttribute('data-prix')) || 0;
+                });
+
+                document.getElementById('inputCoutTotal').value = total.toFixed(2);
+                await Html.RenderPartialAsync("_ValidationScriptsPartial");
+            });
+        });
+    </script>
+}

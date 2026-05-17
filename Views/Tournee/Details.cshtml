@@ -1,0 +1,80 @@
+﻿@model TMS_Project.ViewModels.TourneeDetailsViewModel
+@{
+    ViewData["Title"] = "Détails - Tournée";
+}
+
+<h3>Détails de la tournée #@Model.Tournee.TourneeId</h3>
+
+<table class="table">
+    <tr><th>ID</th><td>@Model.Tournee.TourneeId</td></tr>
+    <tr><th>Date</th><td>@Model.Tournee.DateTournee.ToString("dd/MM/yyyy HH:mm")</td></tr>
+    <tr><th>Transporteur</th><td>@Model.Tournee.Transporteur?.Nom</td></tr>
+    <tr><th>Camion</th><td>@Model.Tournee.Camion?.Immatriculation</td></tr>
+    <tr><th>Chauffeur</th><td>@(Model.Tournee.Chauffeur != null ? $"{Model.Tournee.Chauffeur.Prenom} {Model.Tournee.Chauffeur.Nom}" : "—")</td></tr>
+    <tr><th>Coût total</th><td>@Model.Tournee.CoutTotal.ToString("C")</td></tr>
+</table>
+
+<h4>Livraisons</h4>
+@if (!Model.Tournee.Livraisons.Any())
+{
+    <p class="text-muted">Aucune livraison affectée.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Adresse</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var livraison in Model.Tournee.Livraisons)
+            {
+                <tr>
+                    <td>#@livraison.LivraisonId</td>
+                    <td>@livraison.Client?.Nom</td>
+                    <td>@livraison.Adresse</td>
+                    <td>@livraison.StatutLivraison</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h4>Coûts</h4>
+@if (!Model.Couts.Any())
+{
+    <p class="text-muted">Aucun coût enregistré.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cout in Model.Couts)
+            {
+                <tr>
+                    <td>@cout.DateCout.ToString("dd/MM/yyyy")</td>
+                    <td>@cout.TypeCout</td>
+                    <td>@cout.Description</td>
+                    <td>@cout.Montant.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Tournee.TourneeId" class="btn btn-warning">Modifier</a>
+    <a asp-action="Index" class="btn btn-secondary">Retour</a>
+</div>

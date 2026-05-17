@@ -1,0 +1,133 @@
+@model ClientStatusViewModel
+
+@{
+    ViewData["Title"] = "Suivi client";
+}
+
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-dark">Suivre ma demande</h1>
+        <p class="text-muted">Entrez votre référence et l'email utilisé pendant la demande.</p>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+                <h4 class="fw-bold text-dark mb-4"><i class="bi bi-search text-success"></i> Recherche</h4>
+                
+                <form asp-action="Suivi" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+                    
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                    <div class="col-12">
+                        <label asp-for="DemandeLivraisonId" class="form-label text-secondary small fw-bold">Numéro de Demande</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">#</span>
+                            <input asp-for="DemandeLivraisonId" type="number" class="form-control bg-light border-0 py-2" placeholder="Ex: 1" required />
+                        </div>
+                        <span asp-validation-for="DemandeLivraisonId" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="EmailClient" class="form-label text-secondary small fw-bold">Adresse Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="EmailClient" type="email" class="form-control bg-light border-0 py-2" placeholder="votre@email.com" required />
+                        </div>
+                        <span asp-validation-for="EmailClient" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-success w-100 rounded-pill py-2.5 fw-bold text-white shadow-sm">
+                            <i class="bi bi-search"></i> Voir le statut
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100 d-flex flex-column justify-content-center">
+                
+                @if (Model == null || Model.Demande == null)
+                {
+                    <div class="text-center py-5 opacity-75">
+                        <div class="display-1 text-muted mb-3"><i class="bi bi-clipboard2-check"></i></div>
+                        <div class="fs-5 text-secondary">Votre statut apparaîtra ici après recherche.</div>
+                    </div>
+                }
+                else
+                {
+                    var statusClass = Model.Demande.Statut == "Livree" ? "bg-success text-white" :
+                                      Model.Demande.Statut == "Refusee" ? "bg-danger text-white" : "bg-warning text-dark";
+                    var recuDisponible = Model.Demande.Statut == "Acceptee" || Model.Demande.Statut == "Livree";
+
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="fw-bold text-dark m-0">Demande #@Model.Demande.DemandeLivraisonId</h3>
+                            <span class="badge @statusClass px-3 py-2 rounded-pill fw-bold">@Model.Demande.Statut</span>
+                        </div>
+
+                        @if (recuDisponible)
+                        {
+                            <div class="alert alert-success border-0 rounded-3 small mb-4">
+                                <i class="bi bi-check-circle-fill"></i> Votre demande a reçu l'accord de l'administration. Le reçu est maintenant disponible.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning border-0 rounded-3 small mb-4">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Votre reçu reste bloqué jusqu'à l'accord de l'administrateur.
+                            </div>
+                        }
+
+                        <div class="list-group list-group-flush border-top border-bottom my-3">
+                            <div class="list-group-item d-flex justify-content-between bg-transparent border-0 px-0 py-2">
+                                <span class="text-muted">Client</span>
+                                <span class="fw-semibold">@Model.Demande.Client?.Nom</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between bg-transparent border-0 px-0 py-2">
+                                <span class="text-muted">Date souhaitée</span>
+                                <span class="fw-semibold">@Model.Demande.DateSouhaitee.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between bg-transparent border-0 px-0 py-2">
+                                <span class="text-muted">Statut actuel</span>
+                                <span class="fw-bold text-uppercase @(Model.Demande.Statut == "Livree" ? "text-success" : Model.Demande.Statut == "Refusee" ? "text-danger" : "text-warning")">
+                                    @Model.Demande.Statut
+                                </span>
+                            </div>
+                            
+                            @if (recuDisponible)
+                            {
+                                <div class="list-group-item d-flex justify-content-between bg-transparent border-0 px-0 py-2">
+                                    <span class="text-muted">Marchandise</span>
+                                    <span class="fw-semibold">@Model.Demande.DescriptionMarchandise</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between bg-transparent border-0 px-0 py-2">
+                                    <span class="text-muted">Montant estimé</span>
+                                    <span class="fw-bold text-success">@Model.Demande.MontantEstime.ToString("0.00") MAD</span>
+                                </div>
+                            }
+                        </div>
+
+                        @if (recuDisponible)
+                        {
+                            <div class="mt-4">
+                                <a asp-action="Recu" asp-route-id="@Model.Demande.DemandeLivraisonId" class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold">
+                                    <i class="bi bi-receipt"></i> Voir le reçu
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

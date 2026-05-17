@@ -1,0 +1,67 @@
+﻿@model TMS_Project.Models.Transporteur
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-warning text-dark py-3 rounded-top-4">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Modifier le Transporteur</h4>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TransporteurId" />
+
+                <!-- Nom -->
+                <div class="mb-3">
+                    <label asp-for="Nom" class="form-label fw-bold">Nom</label>
+                    <input asp-for="Nom" class="form-control rounded-3 py-2" placeholder="Nom de la société" />
+                    <span asp-validation-for="Nom" class="text-danger small"></span>
+                </div>
+
+                <!-- Adresse -->
+                <div class="mb-3">
+                    <label asp-for="Adresse" class="form-label fw-bold">Adresse</label>
+                    <input asp-for="Adresse" class="form-control rounded-3 py-2" placeholder="Adresse complète" />
+                    <span asp-validation-for="Adresse" class="text-danger small"></span>
+                </div>
+
+                <!-- Telephone -->
+                <div class="mb-3">
+                    <label asp-for="Telephone" class="form-label fw-bold">Telephone</label>
+                    <input asp-for="Telephone" class="form-control rounded-3 py-2" placeholder="Numéro de téléphone" />
+                    <span asp-validation-for="Telephone" class="text-danger small"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-bold">Email</label>
+                    <input asp-for="Email" type="email" class="form-control rounded-3 py-2" placeholder="Email de contact" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <!-- DateCreation -->
+                <div class="mb-4">
+                    <label asp-for="DateCreation" class="form-label fw-bold text-muted">Date de Création (Lecture seule)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="bi bi-calendar3"></i></span>
+                        <input asp-for="DateCreation" type="date" class="form-control bg-light border-start-0 rounded-end-3 py-2" readonly />
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                        <i class="bi bi-check-circle me-1"></i> Enregistrer
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary px-4 py-2 rounded-3">
+                        <i class="bi bi-arrow-left me-1"></i> Retour
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
